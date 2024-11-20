@@ -14,7 +14,7 @@ class StopAWS(StopCloudInstance):
         params = {
             "InstanceIds": ids,
         }
-        ec2.stop_instances(**params)
+        ec2.terminate_instances(**params)
 
     def wait_until_removed(self, ids: list[str], **kwargs):
         ec2 = boto3.client("ec2", self.region_name)
