@@ -6,10 +6,10 @@ runs:
 inputs:
   aws_region_name:
     description: "The AWS region name to use for your runner. Will not start if not specified."
-    required: false
+    required: true
   instance_mapping:
     description: "A JSON object mapping instance ids to unique GitHub runner labels. Required to stop created instances."
-    required: false
+    required: true
   repo:
     description: "The repo to run against. Will use the the current repo if not specified."
     required: false
