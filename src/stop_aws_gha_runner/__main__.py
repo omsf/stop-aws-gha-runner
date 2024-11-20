@@ -28,7 +28,8 @@ def main():
         aws_params["region_name"] = region_name
 
     gh = GitHubInstance(token=os.environ["GH_PAT"], repo=gha_params["repo"])
-    TeardownInstance(StopAWS, cloud_params=aws_params, gh=gh)
+    deployment = TeardownInstance(StopAWS, cloud_params=aws_params, gh=gh)
+    deployment.stop_runner_instances()
 
 
 if __name__ == "__main__":
