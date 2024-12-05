@@ -1,33 +1,33 @@
 import os
 from stop_aws_gha_runner.stop import StopAWS
 from gha_runner.clouddeployment import TeardownInstance
+from gha_runner.helper.input import EnvVarBuilder, check_required
 from gha_runner.gh import GitHubInstance
 
 
 def main():
-    # Check for required environment variables
+    env = dict(os.environ)
     required = ["GH_PAT", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
-    for req in required:
-        if req not in os.environ:
-            raise Exception(f"Missing required environment variable {req}")
-    aws_params = {}
+    # Check for required environment variables
+    check_required(env, required)
+    # Build the environment variables
+    aws_params = (
+        EnvVarBuilder(env)
+        # This is the default case
+        .with_var("AWS_REGION", "region_name")
+        # This is the input case
+        .with_var("INPUT_AWS_REGION_NAME", "region_name")
+        # This is the base case
+        .with_var("GITHUB_REPOSITORY", "repo")
+        # This is the input case
+        .with_var("INPUT_GH_REPO", "repo")
+        .with_var("INPUT_INSTANCE_MAPPING", "instance_mapping", is_json=True)
+        .build()
+    )
 
-    gha_params = {
-        "token": os.environ["GH_PAT"],
-    }
-    repo = os.environ.get("INPUT_REPO")
-    if repo is None or repo == "":
-        repo = os.environ.get("GITHUB_REPOSITORY")
-    # We check again to validate that this was set correctly
-    if repo is not None or repo == "":
-        gha_params["repo"] = repo
-    else:
-        raise Exception("Repo key is missing or GITHUB_REPOSITORY is missing")
-    region_name = os.environ.get("INPUT_AWS_REGION_NAME")
-    if region_name is not None:
-        aws_params["region_name"] = region_name
+    token = os.environ["GH_PAT"]
 
-    gh = GitHubInstance(token=os.environ["GH_PAT"], repo=gha_params["repo"])
+    gh = GitHubInstance(token, repo=aws_params["repo"])
     deployment = TeardownInstance(StopAWS, cloud_params=aws_params, gh=gh)
     deployment.stop_runner_instances()
 

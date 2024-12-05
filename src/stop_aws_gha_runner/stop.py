@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 from gha_runner.clouddeployment import StopCloudInstance
-import json
-import os
 import boto3
 
 
 @dataclass
 class StopAWS(StopCloudInstance):
     region_name: str
+    instance_mapping: dict[str, str]
 
     def remove_instances(self, ids: list[str]):
         ec2 = boto3.client("ec2", self.region_name)
@@ -28,9 +27,4 @@ class StopAWS(StopCloudInstance):
             waiter.wait(InstanceIds=ids, WaiterConfig=waiter_config)
 
     def get_instance_mapping(self) -> dict[str, str]:
-        mapping_str = os.environ.get("INPUT_INSTANCE_MAPPING")
-        if mapping_str is None:
-            raise ValueError(
-                "Missing required input variable INPUT_INSTANCE_MAPPING"
-            )
-        return json.loads(mapping_str)
+        return self.instance_mapping
