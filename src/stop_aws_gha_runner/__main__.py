@@ -11,7 +11,7 @@ def main():
     # Check for required environment variables
     check_required(env, required)
     # Build the environment variables
-    aws_params = (
+    cloud_params = (
         EnvVarBuilder(env)
         # This is the default case
         .with_var("AWS_REGION", "region_name")
@@ -26,9 +26,11 @@ def main():
     )
 
     token = os.environ["GH_PAT"]
+    # This is not needed by the StopAWS class
+    repo = cloud_params.pop("repo")
 
-    gh = GitHubInstance(token, repo=aws_params["repo"])
-    deployment = TeardownInstance(StopAWS, cloud_params=aws_params, gh=gh)
+    gh = GitHubInstance(token, repo)
+    deployment = TeardownInstance(StopAWS, cloud_params, gh)
     deployment.stop_runner_instances()
 
 
