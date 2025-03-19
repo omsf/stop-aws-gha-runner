@@ -1,15 +1,15 @@
-name: gha-runner
-description: A simple GitHub Action for creating self-hosted runners.
+name: stop-aws-gha-runner
+description: A simple GitHub Action for stopping self-hosted runners on AWS EC2 instances.
 runs:
   using: "docker"
   image: "Dockerfile"
 inputs:
   aws_region_name:
-    description: "The AWS region name to use for your runner. Will not start if not specified."
-    required: true
+    description: "The AWS region name to use for your runner. Defaults to AWS_REGION."
+    required: false
   instance_mapping:
-    description: "A JSON object mapping instance ids to unique GitHub runner labels. Required to stop created instances."
+    description: "A JSON object mapping instance ids to unique GitHub runner labels. This should be the same as the AWS `start` output, `mapping`. Required to stop created instances."
     required: true
   repo:
-    description: "The repo to run against. Will use the the current repo if not specified."
+    description: "The repo to run against. Will use the current repo if not specified."
     required: false

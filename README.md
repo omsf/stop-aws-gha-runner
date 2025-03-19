@@ -8,7 +8,7 @@ This repository contains the code to stop a GitHub Actions runner on an AWS EC2 
 | repo              | The repo to run against. Will use the current repo if not specified.                                                                                                | false            | The repo the runner is running in |
 ## Example usage
 ```yaml
-name: Start AWS GHA Runner
+name: Start and Stop AWS GHA Runner
 on:
   workflow_run:
 jobs:
@@ -28,7 +28,7 @@ jobs:
           aws-region: us-east-1
       - name: Create cloud runner
         id: aws-start
-        uses: omsf-eco-infra/start-aws-gha-runner@v1.0.0
+        uses: omsf/start-aws-gha-runner@v1.0.0
         with:
           aws_image_id: ami-0f7c4a792e3fb63c8
           aws_instance_type: g4dn.xlarge
@@ -40,20 +40,18 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    outputs:
-      mapping: ${{ steps.aws-stop.outputs.mapping }}
-      instances: ${{ steps.aws-stop.outputs.instances }}
+    needs: start-aws-runner
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: us-east-1
-      - name: Create cloud runner
+      - name: Stop cloud runner
         id: aws-stop
-        uses: omsf-eco-infra/gha-runner@main
+        uses: omsf/stop-aws-gha-runner@v1.0.0
         with:
-          instance-mapping: ${{ steps.aws-start.outputs.mapping }}
+          instance_mapping: ${{ needs.start-aws-runner.outputs.mapping }}
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
 ```
