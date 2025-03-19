@@ -1,6 +1,6 @@
 [project]
 name = "stop-aws-gha-runner"
-version = "0.1.0"
+version = "1.0.0"
 description = "Stop an AWS GitHub Actions Runner"
 authors = [{ name = "Ethan Holz", email = "ethan.holz@omsf.io" }]
 readme = "README.md"
